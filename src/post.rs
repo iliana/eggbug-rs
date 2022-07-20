@@ -2,6 +2,7 @@ use crate::{Attachment, AttachmentId, Error, Session};
 use derive_more::{Display, FromStr};
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
+use std::fmt::{self, Debug};
 
 #[allow(clippy::module_name_repetitions)]
 #[derive(
@@ -54,10 +55,12 @@ impl Post {
             return Err(Error::FailedAttachment);
         }
 
+        let need_upload = self.attachments.iter().any(Attachment::is_new);
+
         let PostResponse { post_id } = session
             .client
             .request(method, path)
-            .json(&self.as_api())
+            .json(&self.as_api(need_upload))
             .send()
             .await?
             .error_for_status()?
@@ -65,7 +68,7 @@ impl Post {
             .await?;
         tracing::info!(%post_id);
 
-        if self.attachments.iter().any(Attachment::is_new) {
+        if need_upload {
             futures::future::try_join_all(
                 self.attachments
                     .iter_mut()
@@ -76,7 +79,7 @@ impl Post {
             session
                 .client
                 .put(&format!("project/{}/posts/{}", project, post_id))
-                .json(&self.as_api())
+                .json(&self.as_api(false))
                 .send()
                 .await?
                 .error_for_status()?;
@@ -85,7 +88,8 @@ impl Post {
         Ok(post_id)
     }
 
-    fn as_api(&self) -> ApiPost<'_> {
+    #[tracing::instrument]
+    fn as_api(&self, force_draft: bool) -> ApiPost<'_> {
         let mut blocks = self
             .attachments
             .iter()
@@ -103,14 +107,16 @@ impl Post {
             }
         }
 
-        ApiPost {
+        let post = ApiPost {
             adult_content: self.adult_content,
             blocks,
             cws: &self.content_warnings,
             headline: &self.headline,
-            post_state: if self.draft { 0 } else { 1 },
+            post_state: if force_draft || self.draft { 0 } else { 1 },
             tags: &self.tags,
-        }
+        };
+        tracing::debug!(?post);
+        post
     }
 }
 
@@ -124,6 +130,12 @@ struct ApiPost<'a> {
     headline: &'a str,
     post_state: u64,
     tags: &'a [String],
+}
+
+impl Debug for ApiPost<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", serde_json::to_value(self).map_err(|_| fmt::Error)?)
+    }
 }
 
 #[derive(Serialize)]
