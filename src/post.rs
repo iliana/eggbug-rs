@@ -96,11 +96,11 @@ impl Post {
             })
             .collect::<Vec<_>>();
         if !self.markdown.is_empty() {
-            blocks.push(ApiBlock::Markdown {
-                markdown: ApiMarkdown {
-                    content: &self.markdown,
-                },
-            });
+            for block in self.markdown.split("\n\n") {
+                blocks.push(ApiBlock::Markdown {
+                    markdown: ApiMarkdown { content: block },
+                });
+            }
         }
 
         ApiPost {

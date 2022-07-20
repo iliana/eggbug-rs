@@ -29,12 +29,12 @@ async fn main() -> Result<()> {
             )
             .await?,
         ],
-        draft: true,
+        draft: false,
         ..Default::default()
     };
     let id = session.create_post(&project, &mut post).await?;
 
-    post.markdown = "yahoo".into();
+    post.markdown = "yahoo\n\n---\n\nread more works!".into();
     session.edit_post(&project, id, &mut post).await?;
 
     Ok(())
