@@ -16,13 +16,43 @@ impl Session {
     }
 
     /// Create a post.
+    ///
+    /// Returns the new post's ID.
     #[tracing::instrument(skip(self))]
     pub async fn create_post(&self, page: &str, post: &mut Post) -> Result<PostId, Error> {
-        post.send(self, Method::POST, &format!("project/{}/posts", page), page)
-            .await
+        post.send(
+            self,
+            Method::POST,
+            &format!("project/{}/posts", page),
+            page,
+            None,
+        )
+        .await
+    }
+
+    /// Share a post.
+    ///
+    /// Returns the new post's ID.
+    #[tracing::instrument(skip(self))]
+    pub async fn share_post(
+        &self,
+        page: &str,
+        shared_post: PostId,
+        post: &mut Post,
+    ) -> Result<PostId, Error> {
+        post.send(
+            self,
+            Method::POST,
+            &format!("project/{}/posts", page),
+            page,
+            Some(shared_post),
+        )
+        .await
     }
 
     /// Edit a post.
+    ///
+    /// Returns the edited post's ID.
     #[tracing::instrument(skip(self))]
     pub async fn edit_post(
         &self,
@@ -35,6 +65,7 @@ impl Session {
             Method::PUT,
             &format!("project/{}/posts/{}", page, id),
             page,
+            None,
         )
         .await
     }

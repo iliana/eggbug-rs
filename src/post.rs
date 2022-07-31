@@ -62,8 +62,9 @@ impl Post {
         method: Method,
         path: &str,
         project: &str,
+        shared_post: Option<PostId>,
     ) -> Result<PostId, Error> {
-        if self.is_empty() {
+        if self.is_empty() && shared_post.is_none() {
             return Err(Error::EmptyPost);
         }
         if self.attachments.iter().any(Attachment::is_failed) {
@@ -75,7 +76,7 @@ impl Post {
         let PostResponse { post_id } = session
             .client
             .request(method, path)
-            .json(&self.as_api(need_upload))
+            .json(&self.as_api(need_upload, shared_post))
             .send()
             .await?
             .error_for_status()?
@@ -94,7 +95,7 @@ impl Post {
             session
                 .client
                 .put(&format!("project/{}/posts/{}", project, post_id))
-                .json(&self.as_api(false))
+                .json(&self.as_api(false, shared_post))
                 .send()
                 .await?
                 .error_for_status()?;
@@ -104,7 +105,7 @@ impl Post {
     }
 
     #[tracing::instrument]
-    fn as_api(&self, force_draft: bool) -> ApiPost<'_> {
+    fn as_api(&self, force_draft: bool, shared_post: Option<PostId>) -> ApiPost<'_> {
         let mut blocks = self
             .attachments
             .iter()
@@ -128,6 +129,7 @@ impl Post {
             cws: &self.content_warnings,
             headline: &self.headline,
             post_state: if force_draft || self.draft { 0 } else { 1 },
+            share_of_post_id: shared_post,
             tags: &self.tags,
         };
         tracing::debug!(?post);
@@ -144,6 +146,8 @@ struct ApiPost<'a> {
     cws: &'a [String],
     headline: &'a str,
     post_state: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    share_of_post_id: Option<PostId>,
     tags: &'a [String],
 }
 
