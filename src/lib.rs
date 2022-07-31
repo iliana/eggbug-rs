@@ -26,6 +26,10 @@
 //! # Ok(())
 //! # }
 //! ```
+//!
+//! # License
+//!
+//! eggbug-rs is released under the terms of the Anti-Capitalist Software License, version 1.4.
 
 #![deny(elided_lifetimes_in_paths)]
 #![warn(clippy::pedantic, missing_docs)]
