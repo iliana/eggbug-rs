@@ -6,7 +6,7 @@
 //!
 //! # async fn f() -> Result<(), Box<dyn std::error::Error>> {
 //! // Log in
-//! let session = Session::login("eggbug@invalid.email", "hunter2").await?;
+//! let session = Session::login("eggbug@website.invalid", "hunter2").await?;
 //!
 //! // Describe a post
 //! let mut post = Post {
