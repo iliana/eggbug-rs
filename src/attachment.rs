@@ -36,7 +36,12 @@ pub struct AttachmentId(pub Uuid);
 /// attachment. If successful, the attachment becomes ["uploaded"][`Attachment::is_uploaded`]; if
 /// not, the attachment becomes ["failed"][`Attachment::is_failed`].
 #[derive(Debug)]
-pub struct Attachment(Inner);
+pub struct Attachment {
+    kind: Inner,
+
+    /// Alt text associated with this attachment.
+    pub alt_text: String,
+}
 
 #[derive(Debug)]
 enum Inner {
@@ -65,12 +70,15 @@ impl Attachment {
     /// Panics if the length of `content` overflows a [`u64`].
     pub fn new(content: impl Into<Bytes>, filename: String, content_type: String) -> Attachment {
         let content: Bytes = content.into();
-        Attachment(Inner::New {
-            content_length: content.len().try_into().unwrap(),
-            stream: content.into(),
-            filename,
-            content_type,
-        })
+        Attachment {
+            kind: Inner::New {
+                content_length: content.len().try_into().unwrap(),
+                stream: content.into(),
+                filename,
+                content_type,
+            },
+            alt_text: String::new(),
+        }
     }
 
     /// Create an `Attachment` from a file on disk.
@@ -93,39 +101,51 @@ impl Attachment {
         let content_length = file.metadata().await?.len();
         let stream = Body::wrap_stream(FramedRead::new(file, BytesCodec::new()));
 
-        Ok(Attachment(Inner::New {
-            stream,
-            filename,
-            content_type,
-            content_length,
-        }))
+        Ok(Attachment {
+            kind: Inner::New {
+                stream,
+                filename,
+                content_type,
+                content_length,
+            },
+            alt_text: String::new(),
+        })
+    }
+
+    /// Sets new alt text in a builder-style function.
+    #[must_use]
+    pub fn with_alt_text(self, alt_text: String) -> Attachment {
+        Attachment {
+            kind: self.kind,
+            alt_text,
+        }
     }
 
     /// Returns true if the attachment has not yet been uploaded.
     pub fn is_new(&self) -> bool {
-        matches!(self.0, Inner::New { .. })
+        matches!(self.kind, Inner::New { .. })
     }
 
     /// Returns true if the attachment is uploaded.
     pub fn is_uploaded(&self) -> bool {
-        matches!(self.0, Inner::Uploaded { .. })
+        matches!(self.kind, Inner::Uploaded { .. })
     }
 
     /// Returns true if the attachment failed to upload. Failed attachments cannot be recovered.
     pub fn is_failed(&self) -> bool {
-        matches!(self.0, Inner::Failed)
+        matches!(self.kind, Inner::Failed)
     }
 
     /// If the attachment is uploaded, returns the CDN URL.
     pub fn url(&self) -> Option<&str> {
-        match &self.0 {
+        match &self.kind {
             Inner::Uploaded(Finished { url, .. }) => Some(url),
             _ => None,
         }
     }
 
     pub(crate) fn id(&self) -> Option<AttachmentId> {
-        match self.0 {
+        match self.kind {
             Inner::Uploaded(Finished { attachment_id, .. }) => Some(attachment_id),
             _ => None,
         }
@@ -139,7 +159,7 @@ impl Attachment {
         id: PostId,
     ) -> Result<(), Error> {
         let (stream, filename, content_type, content_length) =
-            match std::mem::replace(&mut self.0, Inner::Failed) {
+            match std::mem::replace(&mut self.kind, Inner::Failed) {
                 Inner::New {
                     stream,
                     filename,
@@ -183,7 +203,7 @@ impl Attachment {
             .await?
             .error_for_status()?;
 
-        self.0 = Inner::Uploaded(
+        self.kind = Inner::Uploaded(
             client
                 .post(&format!(
                     "project/{}/posts/{}/attach/finish/{}",

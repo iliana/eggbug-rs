@@ -113,6 +113,7 @@ impl Post {
             .iter()
             .map(|attachment| ApiBlock::Attachment {
                 attachment: ApiAttachment {
+                    alt_text: &attachment.alt_text,
                     attachment_id: attachment.id(),
                 },
             })
@@ -162,13 +163,14 @@ impl Debug for ApiPost<'_> {
 #[derive(Serialize)]
 #[serde(tag = "type", rename_all = "camelCase")]
 enum ApiBlock<'a> {
-    Attachment { attachment: ApiAttachment },
+    Attachment { attachment: ApiAttachment<'a> },
     Markdown { markdown: ApiMarkdown<'a> },
 }
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
-struct ApiAttachment {
+struct ApiAttachment<'a> {
+    alt_text: &'a str,
     #[serde(serialize_with = "serialize_attachment_id")]
     attachment_id: Option<AttachmentId>,
 }
@@ -206,19 +208,23 @@ mod tests {
     fn test_serialize_attachment() {
         assert_eq!(
             serde_json::to_value(&ApiAttachment {
+                alt_text: "",
                 attachment_id: Some(AttachmentId(uuid!("92bfaa11-8e42-4f60-acf4-6fd714b5678b")))
             })
             .unwrap(),
             json!({
+                "altText": "",
                 "attachmentId": "92bfaa11-8e42-4f60-acf4-6fd714b5678b",
             })
         );
         assert_eq!(
             serde_json::to_value(&ApiAttachment {
+                alt_text: "",
                 attachment_id: None
             })
             .unwrap(),
             json!({
+                "altText": "",
                 "attachmentId": "",
             })
         );

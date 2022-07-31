@@ -20,15 +20,14 @@ async fn main() -> Result<()> {
 
     let mut post = Post {
         headline: "test from eggbug-rs".into(),
-        attachments: vec![
-            Attachment::new_from_file(
-                Path::new(env!("CARGO_MANIFEST_DIR"))
-                    .join("examples")
-                    .join("uh-oh.png"),
-                "image/png".into(),
-            )
-            .await?,
-        ],
+        attachments: vec![Attachment::new_from_file(
+            Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("examples")
+                .join("uh-oh.png"),
+            "image/png".into(),
+        )
+        .await?
+        .with_alt_text("eggbug with question mark".into())],
         draft: false,
         ..Default::default()
     };
