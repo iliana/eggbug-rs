@@ -3,6 +3,7 @@ name = "eggbug"
 version = "0.1.0"
 edition = "2021"
 description = "Bot library for cohost.org"
+repository = "https://github.com/iliana/eggbug-rs"
 license-file = "LICENSE.md"
 
 [dependencies]
