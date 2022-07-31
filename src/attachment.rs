@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use uuid::Uuid;
 
+/// An attachment ID.
 #[allow(clippy::module_name_repetitions)]
 #[derive(
     Clone,
@@ -26,6 +27,12 @@ use uuid::Uuid;
 #[serde(transparent)]
 pub struct AttachmentId(pub Uuid);
 
+/// Describes an attachment.
+///
+/// Attachments are created in the ["new"][`Attachment::is_new`] state. When part of a
+/// [`Post`][`crate::Post`] that is created or edited, the client attempts to upload the
+/// attachment. If successful, the attachment becomes ["uploaded"][`Attachment::is_uploaded`]; if
+/// not, the attachment becomes ["failed"][`Attachment::is_failed`].
 #[derive(Debug)]
 pub struct Attachment(Inner);
 
@@ -92,18 +99,22 @@ impl Attachment {
         }))
     }
 
+    /// Returns true if the attachment has not yet been uploaded.
     pub fn is_new(&self) -> bool {
         matches!(self.0, Inner::New { .. })
     }
 
+    /// Returns true if the attachment is uploaded.
     pub fn is_uploaded(&self) -> bool {
         matches!(self.0, Inner::Uploaded { .. })
     }
 
+    /// Returns true if the attachment failed to upload. Failed attachments cannot be recovered.
     pub fn is_failed(&self) -> bool {
         matches!(self.0, Inner::Failed)
     }
 
+    /// If the attachment is uploaded, returns the CDN URL.
     pub fn url(&self) -> Option<&str> {
         match &self.0 {
             Inner::Uploaded(Finished { url, .. }) => Some(url),

@@ -18,6 +18,7 @@ macro_rules! request_impl {
     };
 }
 
+/// HTTP client.
 #[derive(Debug, Clone)]
 pub struct Client {
     pub(crate) base_url: Cow<'static, str>,
@@ -46,6 +47,7 @@ impl Client {
         }
     }
 
+    /// Creates a new `Client` with a custom base URL.
     #[must_use]
     pub fn with_base_url(mut self, mut base_url: String) -> Client {
         if !base_url.ends_with('/') {
@@ -55,7 +57,7 @@ impl Client {
         self
     }
 
-    /// Logs into Cohost with an email and password, returning a [`Session`].
+    /// Logs into cohost with an email and password, returning a [`Session`].
     ///
     /// Securely storing the user's password is an exercise left to the caller.
     #[tracing::instrument(skip(self, password))]

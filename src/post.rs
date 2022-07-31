@@ -4,6 +4,7 @@ use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Debug};
 
+/// A post ID.
 #[allow(clippy::module_name_repetitions)]
 #[derive(
     Clone,
@@ -23,19 +24,33 @@ use std::fmt::{self, Debug};
 #[serde(transparent)]
 pub struct PostId(pub u64);
 
+/// Describes a post's contents.
+///
+/// When you send a post with [`Session::create_post`] or [`Session::edit_post`], the `Post` must
+/// be mutable. This is because the [`attachments`][`Post::attachments`] field will be modified
+/// with the ID and URL of the uploaded attachment.
 #[derive(Debug, Default)]
 #[must_use]
 pub struct Post {
+    /// Marks the post as [adult content](https://help.antisoftware.club/support/solutions/articles/62000225024-what-does-adult-content-mean-).
     pub adult_content: bool,
-    pub attachments: Vec<Attachment>,
-    pub content_warnings: Vec<String>,
-    pub draft: bool,
+    /// Post headline, which is displayed above attachments and markdown.
     pub headline: String,
+    /// List of attachments, displayed between the headline and markdown.
+    pub attachments: Vec<Attachment>,
+    /// Markdown content for the post, displayed after the headline and attachments.
     pub markdown: String,
+    /// List of tags.
     pub tags: Vec<String>,
+    /// List of content warnings.
+    pub content_warnings: Vec<String>,
+    /// Marks the post as a draft, preventing it from being seen by other users without the draft
+    /// link.
+    pub draft: bool,
 }
 
 impl Post {
+    /// Returns true if the post has no content (no headline, attachments, or markdown content).
     #[must_use]
     pub fn is_empty(&self) -> bool {
         self.attachments.is_empty() && self.headline.is_empty() && self.markdown.is_empty()
