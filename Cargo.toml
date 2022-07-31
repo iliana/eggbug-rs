@@ -8,7 +8,7 @@ license-file = "LICENSE.md"
 [dependencies]
 base64 = "0.13.0"
 bytes = "1.1.0"
-derive_more = { version = "0.99.17", default-features = false, features = ["from_str", "display"] }
+derive_more = { version = "0.99.17", default-features = false, features = ["display", "from", "from_str", "into"] }
 futures = { version = "0.3.21", default-features = false, features = ["alloc"] }
 hmac = "0.12.1"
 pbkdf2 = { version = "0.11.0", default-features = false }

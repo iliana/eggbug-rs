@@ -1,5 +1,5 @@
 use crate::{Attachment, AttachmentId, Error, Session};
-use derive_more::{Display, FromStr};
+use derive_more::{Display, From, FromStr, Into};
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Debug};
@@ -14,8 +14,10 @@ use std::fmt::{self, Debug};
     Deserialize,
     Display,
     Eq,
+    From,
     FromStr,
     Hash,
+    Into,
     Ord,
     PartialEq,
     PartialOrd,

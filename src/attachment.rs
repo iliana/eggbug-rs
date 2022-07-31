@@ -1,6 +1,6 @@
 use crate::{Client, Error, PostId};
 use bytes::Bytes;
-use derive_more::{Display, FromStr};
+use derive_more::{Display, From, FromStr, Into};
 use reqwest::multipart::{Form, Part};
 use reqwest::Body;
 use serde::{Deserialize, Serialize};
@@ -17,8 +17,10 @@ use uuid::Uuid;
     Deserialize,
     Display,
     Eq,
+    From,
     FromStr,
     Hash,
+    Into,
     Ord,
     PartialEq,
     PartialOrd,
