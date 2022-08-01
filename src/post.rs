@@ -114,7 +114,7 @@ impl Post {
             .map(|attachment| ApiBlock::Attachment {
                 attachment: ApiAttachment {
                     alt_text: &attachment.alt_text,
-                    attachment_id: attachment.id(),
+                    attachment_id: attachment.id().unwrap_or_default(),
                 },
             })
             .collect::<Vec<_>>();
@@ -171,8 +171,7 @@ enum ApiBlock<'a> {
 #[serde(rename_all = "camelCase")]
 struct ApiAttachment<'a> {
     alt_text: &'a str,
-    #[serde(serialize_with = "serialize_attachment_id")]
-    attachment_id: Option<AttachmentId>,
+    attachment_id: AttachmentId,
 }
 
 #[derive(Serialize)]
@@ -185,48 +184,4 @@ struct ApiMarkdown<'a> {
 #[serde(rename_all = "camelCase")]
 struct PostResponse {
     post_id: PostId,
-}
-
-fn serialize_attachment_id<S>(id: &Option<AttachmentId>, serializer: S) -> Result<S::Ok, S::Error>
-where
-    S: serde::Serializer,
-{
-    match id {
-        Some(id) => id.serialize(serializer),
-        None => "".serialize(serializer),
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::ApiAttachment;
-    use crate::AttachmentId;
-    use serde_json::json;
-    use uuid::uuid;
-
-    #[test]
-    fn test_serialize_attachment() {
-        assert_eq!(
-            serde_json::to_value(&ApiAttachment {
-                alt_text: "",
-                attachment_id: Some(AttachmentId(uuid!("92bfaa11-8e42-4f60-acf4-6fd714b5678b")))
-            })
-            .unwrap(),
-            json!({
-                "altText": "",
-                "attachmentId": "92bfaa11-8e42-4f60-acf4-6fd714b5678b",
-            })
-        );
-        assert_eq!(
-            serde_json::to_value(&ApiAttachment {
-                alt_text: "",
-                attachment_id: None
-            })
-            .unwrap(),
-            json!({
-                "altText": "",
-                "attachmentId": "",
-            })
-        );
-    }
 }
