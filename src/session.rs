@@ -33,6 +33,8 @@ impl Session {
     /// Share a post.
     ///
     /// Returns the new post's ID.
+    ///
+    /// To share a post with no additional content, use `Post::default()` for `post`.
     #[tracing::instrument(skip(self))]
     pub async fn share_post(
         &self,
