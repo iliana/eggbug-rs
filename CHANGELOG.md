@@ -1,6 +1,6 @@
 ## 0.1.3 -- 2022-11-02
 
-- Fixed decoding the password hashing salt to match the official client (#1). This problem affects roughly half of accounts on cohost, assuming password salts are randomly distributed.
+- Fixed decoding the password hashing salt to match the official client ([#1](https://github.com/iliana/eggbug-rs/issues/1)). This problem affects roughly half of accounts on cohost, assuming password salts are randomly distributed.
 
 ## 0.1.2 -- 2022-08-01
 
