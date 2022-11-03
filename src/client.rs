@@ -74,7 +74,7 @@ impl Client {
         let mut client_hash = [0; PBKDF2_KEY_LENGTH];
         pbkdf2::pbkdf2::<hmac::Hmac<sha2::Sha384>>(
             password.as_bytes(),
-            &base64::decode_config(&salt, base64::URL_SAFE_NO_PAD)?,
+            &decode_salt(&salt)?,
             PBKDF2_ITERATIONS,
             &mut client_hash,
         );
@@ -107,6 +107,28 @@ impl Default for Client {
     fn default() -> Client {
         Client::new()
     }
+}
+
+/// There is a subtle bug(?) in cohost:
+/// - The salt returned from the `login/salt` endpoint returns a string that _appears_ to be
+///   using the URL-safe Base64 alphabet with no padding.
+/// - However, the salt is being decoded with some JavaScript code that uses the standard
+///   (`+/`) alphabet.
+/// - This code uses a lookup table to go from a Base64 character to a 6-bit value. If the
+///   character is not in the lookup table, the lookup returns `undefined`. The code then
+///   performs bitwise operations on the returned value, which is coerced to 0 if not present
+///   in the lookup table.
+///
+/// We can replicate this effect by replacing hyphens and underscores with the `A`, the
+/// Base64 character representing 0.
+///
+/// mogery seemed to know about this when writing cohost.js (see lib/b64arraybuffer.js):
+/// <https://github.com/mogery/cohost.js/commit/c0063a38ae334b4424989242821d0ac1aba78f03>
+fn decode_salt(salt: &str) -> Result<Vec<u8>, Error> {
+    Ok(base64::decode_config(
+        &salt.replace(['-', '_'], "A"),
+        base64::STANDARD_NO_PAD,
+    )?)
 }
 
 #[derive(Deserialize)]
