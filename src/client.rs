@@ -131,6 +131,19 @@ fn decode_salt(salt: &str) -> Result<Vec<u8>, Error> {
     )?)
 }
 
+#[cfg(test)]
+#[test]
+fn test_decode_salt() {
+    assert_eq!(
+        decode_salt("JGhosofJGYFsyBlZspFVYg").unwrap(),
+        base64::decode_config("JGhosofJGYFsyBlZspFVYg", base64::URL_SAFE_NO_PAD).unwrap()
+    );
+    assert_eq!(
+        decode_salt("dg6y2aIj_iKzcgaL_MM8_Q").unwrap(),
+        base64::decode_config("dg6y2aIjAiKzcgaLAMM8AQ", base64::URL_SAFE_NO_PAD).unwrap()
+    );
+}
+
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct SaltResponse {
