@@ -1,4 +1,5 @@
 use crate::{Attachment, Error, Session};
+pub(crate) use de::PostPage;
 use derive_more::{Display, From, FromStr, Into};
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
@@ -281,6 +282,12 @@ impl From<de::Attachment> for Attachment {
     }
 }
 
+impl From<PostPage> for Vec<Post> {
+    fn from(page: PostPage) -> Self {
+        page.items.into_iter().map(|post| post.into()).collect()
+    }
+}
+
 mod ser {
     use super::PostId;
     use crate::attachment::AttachmentId;
@@ -335,9 +342,9 @@ mod de {
     #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
     #[serde(rename_all = "camelCase")]
     pub struct PostPage {
-        pub n_items: u64,
-        pub n_pages: u64,
-        pub items: Vec<Post>,
+        pub(super) n_items: u64,
+        pub(super) n_pages: u64,
+        pub(super) items: Vec<Post>,
     }
 
     #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]

@@ -1,7 +1,7 @@
 # eggbug
 
 eggbug-rs is a bot library for [cohost.org](https://cohost.org/rc/welcome), providing an
-interface to create, edit, and delete posts.
+interface to create, read, edit, and delete posts.
 
 ```rust
 use eggbug::{Post, Session};
