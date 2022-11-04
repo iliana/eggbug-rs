@@ -98,10 +98,10 @@ pub struct PostMetadata {
     pub num_shared_comments: u64,
     /// True if this post is pinned to its author's profile.
     pub pinned: bool,
-    /// The ID of the project that posted this post.
-    pub posting_project_id: ProjectId,
-    /// A list of the IDs of all the projects involved in this post.
-    pub related_projects: Vec<ProjectId>,
+    /// The handle of the project that posted this post.
+    pub posting_project_id: String,
+    /// A list of the handles of all the projects involved in this post.
+    pub related_projects: Vec<String>,
     /// A list of all the posts in this post's branch of the share tree.
     pub share_tree: Vec<Post>,
 }
@@ -227,18 +227,18 @@ impl From<de::Post> for Post {
             num_comments: api.num_comments,
             num_shared_comments: api.num_shared_comments,
             pinned: api.pinned,
-            posting_project_id: api.posting_project.project_id,
             related_projects: {
-                let mut related_projects: Vec<ProjectId> = api
+                let mut related_projects: Vec<String> = api
                     .related_projects
                     .into_iter()
-                    .map(|project| project.project_id)
+                    .map(|project| project.handle)
                     .collect();
                 if related_projects.is_empty() {
-                    related_projects.push(api.posting_project.project_id)
+                    related_projects.push(api.posting_project.handle.clone())
                 };
                 related_projects
             },
+            posting_project_id: api.posting_project.handle,
             share_tree: api
                 .share_tree
                 .into_iter()
