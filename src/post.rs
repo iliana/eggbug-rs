@@ -78,6 +78,7 @@ pub struct Post {
 
 /// Metadata returned by the Cohost API for posts retrieved from post pages.
 #[derive(Debug)]
+#[allow(clippy::struct_excessive_bools, clippy::module_name_repetitions)]
 pub struct PostMetadata {
     /// All identifiers regarding where this post can be found on Cohost.
     pub locations: PostLocations,
@@ -108,6 +109,7 @@ pub struct PostMetadata {
 
 /// All identifying information about where to find a post, from its ID to how to edit it.
 #[derive(Debug, Hash, Clone, PartialEq, Eq)]
+#[allow(clippy::module_name_repetitions)]
 pub struct PostLocations {
     /// The unique numerical ID of the post.
     pub id: PostId,
@@ -234,7 +236,7 @@ impl From<de::Post> for Post {
                     .map(|project| project.handle)
                     .collect();
                 if related_projects.is_empty() {
-                    related_projects.push(api.posting_project.handle.clone())
+                    related_projects.push(api.posting_project.handle.clone());
                 };
                 related_projects
             },
@@ -264,7 +266,7 @@ impl From<de::Post> for Post {
             markdown: api.plain_text_body,
             tags: api.tags,
             content_warnings: api.cws,
-            draft: if api.state == 0 { true } else { false },
+            draft: api.state == 0,
             attachments,
         }
     }
@@ -349,6 +351,7 @@ mod de {
 
     #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
     #[serde(rename_all = "camelCase")]
+    #[allow(clippy::struct_excessive_bools)]
     pub struct Post {
         pub blocks: Vec<Block>,
         pub can_publish: bool,

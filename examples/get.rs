@@ -2,8 +2,7 @@
 #![warn(clippy::pedantic)]
 
 use anyhow::Result;
-use eggbug::{Attachment, Client, Post};
-use std::path::Path;
+use eggbug::Client;
 use tracing_subscriber::{fmt, EnvFilter};
 
 #[tokio::main]
