@@ -37,14 +37,14 @@ pub struct AttachmentId(pub Uuid);
 /// not, the attachment becomes ["failed"][`Attachment::is_failed`].
 #[derive(Debug)]
 pub struct Attachment {
-    kind: Inner,
+    pub(crate) kind: Inner,
 
     /// Alt text associated with this attachment.
     pub alt_text: String,
 }
 
 #[derive(Debug)]
-enum Inner {
+pub(crate) enum Inner {
     New {
         stream: Body,
         filename: String,
@@ -57,9 +57,9 @@ enum Inner {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct Finished {
-    attachment_id: AttachmentId,
-    url: String,
+pub(crate) struct Finished {
+    pub(crate) attachment_id: AttachmentId,
+    pub(crate) url: String,
 }
 
 impl Attachment {
