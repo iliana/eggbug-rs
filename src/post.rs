@@ -28,7 +28,6 @@ use std::fmt::Debug;
 pub struct PostId(pub u64);
 
 /// A project ID.
-#[allow(clippy::module_name_repetitions)]
 #[derive(
     Clone,
     Copy,
@@ -57,7 +56,7 @@ pub struct ProjectId(pub u64);
 #[derive(Debug, Default)]
 #[must_use]
 pub struct Post {
-    /// Marks the post as [adult content](https://help.antisoftware.club/support/solutions/articles/62000225024-what-does-adult-content-mean-).
+    /// Marks the post as [18+ content](https://help.antisoftware.club/support/solutions/articles/62000225024-what-does-adult-content-mean-).
     pub adult_content: bool,
     /// Post headline, which is displayed above attachments and markdown.
     pub headline: String,
