@@ -101,6 +101,8 @@ pub struct PostMetadata {
     pub pinned: bool,
     /// The handle of the project that posted this post.
     pub posting_project_id: String,
+    /// The time at which the post was published.
+    pub publication_date: chrono::DateTime<chrono::Utc>,
     /// A list of the handles of all the projects involved in this post.
     pub related_projects: Vec<String>,
     /// A list of all the posts in this post's branch of the share tree.
@@ -241,6 +243,7 @@ impl From<de::Post> for Post {
                 related_projects
             },
             posting_project_id: api.posting_project.handle,
+            publication_date: api.published_at,
             share_tree: api
                 .share_tree
                 .into_iter()
@@ -373,6 +376,7 @@ mod de {
         pub post_edit_url: String,
         pub post_id: PostId,
         pub posting_project: PostingProject,
+        pub published_at: chrono::DateTime<chrono::Utc>,
         pub related_projects: Vec<PostingProject>,
         pub share_tree: Vec<Post>,
         pub single_post_page_url: String,
@@ -477,6 +481,10 @@ fn test_convert_post() -> Result<(), Box<dyn std::error::Error>> {
         .expect("No metadata for converted post!");
     assert_eq!(post.post_id, converted_post_metadata.locations.id);
     assert!(!converted_post.attachments.is_empty());
+    assert_eq!(
+        converted_post_metadata.publication_date.timestamp(),
+        1667531869
+    );
 
     Ok(())
 }
