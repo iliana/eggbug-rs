@@ -78,7 +78,7 @@ impl Client {
             PBKDF2_ITERATIONS,
             &mut client_hash,
         );
-        let client_hash = base64::encode(&client_hash);
+        let client_hash = base64::encode(client_hash);
 
         let LoginResponse { user_id } = self
             .post("login")

@@ -244,11 +244,7 @@ impl From<de::Post> for Post {
             },
             posting_project_id: api.posting_project.handle,
             publication_date: api.published_at,
-            share_tree: api
-                .share_tree
-                .into_iter()
-                .map(|api_post| api_post.into())
-                .collect(),
+            share_tree: api.share_tree.into_iter().map(Post::from).collect(),
         };
 
         let attachments: Vec<Attachment> = api
@@ -258,7 +254,7 @@ impl From<de::Post> for Post {
                 de::Block::Attachment { attachment } => {
                     Some(crate::attachment::Attachment::from(attachment))
                 }
-                _ => None,
+                de::Block::Markdown { .. } => None,
             })
             .collect();
 
@@ -289,7 +285,7 @@ impl From<de::Attachment> for Attachment {
 
 impl From<PostPage> for Vec<Post> {
     fn from(page: PostPage) -> Self {
-        page.items.into_iter().map(|post| post.into()).collect()
+        page.items.into_iter().map(Post::from).collect()
     }
 }
 
@@ -439,11 +435,14 @@ fn test_parse_project_post_page() -> Result<(), Box<dyn std::error::Error>> {
     let post_page: de::PostPage =
         serde_json::from_str(include_str!("../samples/example.project.posts.json"))?;
     assert_eq!(post_page.n_items, 3);
-    assert_eq!(post_page.n_items as usize, post_page.items.len());
+    assert_eq!(
+        usize::try_from(post_page.n_items).unwrap(),
+        post_page.items.len()
+    );
     let post = post_page
         .items
         .iter()
-        .find(|post| post.post_id.0 == 185838)
+        .find(|post| post.post_id.0 == 185_838)
         .expect("Couldn't find post by ID 185838 as expected; did you change the sample?");
     assert_eq!(post.headline, "This is a test post.");
     assert_eq!(post.filename, "185838-this-is-a-test-post");
@@ -458,7 +457,7 @@ fn test_parse_project_post_page() -> Result<(), Box<dyn std::error::Error>> {
     let post = post_page
         .items
         .iter()
-        .find(|post| post.post_id.0 == 185916)
+        .find(|post| post.post_id.0 == 185_916)
         .expect("Couldn't find post by ID 185916 as expected; did you change the sample?");
 
     assert_eq!(post.related_projects.len(), 2);
@@ -473,7 +472,7 @@ fn test_convert_post() -> Result<(), Box<dyn std::error::Error>> {
     let post = post_page
         .items
         .iter()
-        .find(|post| post.post_id.0 == 185838)
+        .find(|post| post.post_id.0 == 185_838)
         .expect("Couldn't find post by ID 185838 as expected; did you change the sample?");
     let converted_post = Post::from(post.clone());
     let converted_post_metadata = converted_post
@@ -483,7 +482,7 @@ fn test_convert_post() -> Result<(), Box<dyn std::error::Error>> {
     assert!(!converted_post.attachments.is_empty());
     assert_eq!(
         converted_post_metadata.publication_date.timestamp(),
-        1667531869
+        1_667_531_869
     );
 
     Ok(())
