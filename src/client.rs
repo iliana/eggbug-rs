@@ -1,4 +1,4 @@
-use crate::{Error, Session};
+use crate::{Error, Post, Session};
 use reqwest::{Method, RequestBuilder};
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
@@ -91,6 +91,22 @@ impl Client {
         tracing::info!(user_id, "logged in");
 
         Ok(Session { client: self })
+    }
+
+    /// Get a page of posts from the given project.
+    ///
+    /// Pages start at 0. Once you get an empty page, there are no more pages after that to get; they will all be empty.
+    #[tracing::instrument(skip(self))]
+    pub async fn get_posts_page(&self, project: &str, page: u64) -> Result<Vec<Post>, Error> {
+        let posts_page: crate::post::PostPage = self
+            .get(&format!("project/{}/posts", project))
+            .query(&[("page", page.to_string())])
+            .send()
+            .await?
+            .error_for_status()?
+            .json()
+            .await?;
+        Ok(posts_page.into())
     }
 
     #[inline]

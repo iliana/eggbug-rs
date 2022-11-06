@@ -1,0 +1,377 @@
+{
+  "nItems": 3,
+  "nPages": 1,
+  "items": [
+    {
+      "postId": 185922,
+      "headline": "Commentary repost of a post from an adult account from a non adult account",
+      "publishedAt": "2022-11-04T03:29:25.010Z",
+      "filename": "185922-commentary-repost-of",
+      "transparentShareOfPostId": null,
+      "state": 1,
+      "numComments": 2,
+      "numSharedComments": 1,
+      "cws": [],
+      "tags": [],
+      "blocks": [
+        {
+          "type": "markdown",
+          "markdown": {
+            "content": "and it is marked as adult content"
+          }
+        }
+      ],
+      "plainTextBody": "and it is marked as adult content",
+      "postingProject": {
+        "handle": "example",
+        "displayName": "Example Page",
+        "dek": "for use in documentation",
+        "description": "this account was created by @noracodes for use in documentation and testing of the Cohost API. i am happy to hand this account over to @staff or give others access to post here if they want to add cases to the post history or whatever.\r\n\r\nsee also @example-adult and @example-private",
+        "avatarURL": "https://cohost.org/rc/default-avatar/49507.png",
+        "avatarPreviewURL": "https://cohost.org/rc/default-avatar/49507.png",
+        "headerURL": null,
+        "headerPreviewURL": null,
+        "projectId": 49507,
+        "privacy": "public",
+        "pronouns": "",
+        "url": "https://www.rfc-editor.org/rfc/rfc2606.html",
+        "flags": [],
+        "avatarShape": "circle"
+      },
+      "shareTree": [
+        {
+          "postId": 185857,
+          "headline": "This is an adult post.",
+          "publishedAt": "2022-11-04T03:20:56.978Z",
+          "filename": "185857-this-is-an-adult-pos",
+          "transparentShareOfPostId": null,
+          "state": 1,
+          "numComments": 1,
+          "numSharedComments": 0,
+          "cws": [
+            "a content warning",
+            "another content warning",
+            ","
+          ],
+          "tags": [
+            "example tag",
+            "another example tag",
+            "woo spooky adult post"
+          ],
+          "blocks": [
+            {
+              "type": "markdown",
+              "markdown": {
+                "content": "It's adult because it's on an adult account. It's also got Content Warnings."
+              }
+            }
+          ],
+          "plainTextBody": "It's adult because it's on an adult account. It's also got Content Warnings.",
+          "postingProject": {
+            "handle": "example-adult",
+            "displayName": "",
+            "dek": "",
+            "description": "",
+            "avatarURL": "https://cohost.org/rc/default-avatar/49508.png",
+            "avatarPreviewURL": "https://cohost.org/rc/default-avatar/49508.png",
+            "headerURL": null,
+            "headerPreviewURL": null,
+            "projectId": 49508,
+            "privacy": "public",
+            "pronouns": null,
+            "url": null,
+            "flags": [],
+            "avatarShape": "circle"
+          },
+          "shareTree": [],
+          "relatedProjects": [],
+          "singlePostPageUrl": "https://cohost.org/example-adult/post/185857-this-is-an-adult-pos",
+          "effectiveAdultContent": false,
+          "isEditor": false,
+          "contributorBlockIncomingOrOutgoing": false,
+          "hasAnyContributorMuted": false,
+          "postEditUrl": "https://cohost.org/example-adult/post/185857-this-is-an-adult-pos/edit",
+          "isLiked": false,
+          "canShare": false,
+          "canPublish": true,
+          "hasCohostPlus": true,
+          "pinned": false,
+          "commentsLocked": false
+        }
+      ],
+      "relatedProjects": [
+        {
+          "handle": "example",
+          "displayName": "Example Page",
+          "dek": "for use in documentation",
+          "description": "this account was created by @noracodes for use in documentation and testing of the Cohost API. i am happy to hand this account over to @staff or give others access to post here if they want to add cases to the post history or whatever.\r\n\r\nsee also @example-adult and @example-private",
+          "avatarURL": "https://cohost.org/rc/default-avatar/49507.png",
+          "avatarPreviewURL": "https://cohost.org/rc/default-avatar/49507.png",
+          "headerURL": null,
+          "headerPreviewURL": null,
+          "projectId": 49507,
+          "privacy": "public",
+          "pronouns": "",
+          "url": "https://www.rfc-editor.org/rfc/rfc2606.html",
+          "flags": [],
+          "avatarShape": "circle"
+        },
+        {
+          "handle": "example-adult",
+          "displayName": "",
+          "dek": "",
+          "description": "",
+          "avatarURL": "https://cohost.org/rc/default-avatar/49508.png",
+          "avatarPreviewURL": "https://cohost.org/rc/default-avatar/49508.png",
+          "headerURL": null,
+          "headerPreviewURL": null,
+          "projectId": 49508,
+          "privacy": "public",
+          "pronouns": null,
+          "url": null,
+          "flags": [],
+          "avatarShape": "circle"
+        }
+      ],
+      "singlePostPageUrl": "https://cohost.org/example/post/185922-commentary-repost-of",
+      "effectiveAdultContent": true,
+      "isEditor": false,
+      "contributorBlockIncomingOrOutgoing": false,
+      "hasAnyContributorMuted": false,
+      "postEditUrl": "https://cohost.org/example/post/185922-commentary-repost-of/edit",
+      "isLiked": false,
+      "canShare": false,
+      "canPublish": true,
+      "hasCohostPlus": true,
+      "pinned": false,
+      "commentsLocked": false
+    },
+    {
+      "postId": 185916,
+      "headline": "Commentary repost of a post from an adult account from a non adult account",
+      "publishedAt": "2022-11-04T03:28:49.206Z",
+      "filename": "185916-commentary-repost-of",
+      "transparentShareOfPostId": null,
+      "state": 1,
+      "numComments": 0,
+      "numSharedComments": 1,
+      "cws": [],
+      "tags": [],
+      "blocks": [
+        {
+          "type": "markdown",
+          "markdown": {
+            "content": "and it's not marked as adult content"
+          }
+        }
+      ],
+      "plainTextBody": "and it's not marked as adult content",
+      "postingProject": {
+        "handle": "example",
+        "displayName": "Example Page",
+        "dek": "for use in documentation",
+        "description": "this account was created by @noracodes for use in documentation and testing of the Cohost API. i am happy to hand this account over to @staff or give others access to post here if they want to add cases to the post history or whatever.\r\n\r\nsee also @example-adult and @example-private",
+        "avatarURL": "https://cohost.org/rc/default-avatar/49507.png",
+        "avatarPreviewURL": "https://cohost.org/rc/default-avatar/49507.png",
+        "headerURL": null,
+        "headerPreviewURL": null,
+        "projectId": 49507,
+        "privacy": "public",
+        "pronouns": "",
+        "url": "https://www.rfc-editor.org/rfc/rfc2606.html",
+        "flags": [],
+        "avatarShape": "circle"
+      },
+      "shareTree": [
+        {
+          "postId": 185857,
+          "headline": "This is an adult post.",
+          "publishedAt": "2022-11-04T03:20:56.978Z",
+          "filename": "185857-this-is-an-adult-pos",
+          "transparentShareOfPostId": null,
+          "state": 1,
+          "numComments": 1,
+          "numSharedComments": 0,
+          "cws": [
+            "a content warning",
+            "another content warning",
+            ","
+          ],
+          "tags": [
+            "example tag",
+            "another example tag",
+            "woo spooky adult post"
+          ],
+          "blocks": [
+            {
+              "type": "markdown",
+              "markdown": {
+                "content": "It's adult because it's on an adult account. It's also got Content Warnings."
+              }
+            }
+          ],
+          "plainTextBody": "It's adult because it's on an adult account. It's also got Content Warnings.",
+          "postingProject": {
+            "handle": "example-adult",
+            "displayName": "",
+            "dek": "",
+            "description": "",
+            "avatarURL": "https://cohost.org/rc/default-avatar/49508.png",
+            "avatarPreviewURL": "https://cohost.org/rc/default-avatar/49508.png",
+            "headerURL": null,
+            "headerPreviewURL": null,
+            "projectId": 49508,
+            "privacy": "public",
+            "pronouns": null,
+            "url": null,
+            "flags": [],
+            "avatarShape": "circle"
+          },
+          "shareTree": [],
+          "relatedProjects": [],
+          "singlePostPageUrl": "https://cohost.org/example-adult/post/185857-this-is-an-adult-pos",
+          "effectiveAdultContent": false,
+          "isEditor": false,
+          "contributorBlockIncomingOrOutgoing": false,
+          "hasAnyContributorMuted": false,
+          "postEditUrl": "https://cohost.org/example-adult/post/185857-this-is-an-adult-pos/edit",
+          "isLiked": false,
+          "canShare": false,
+          "canPublish": true,
+          "hasCohostPlus": true,
+          "pinned": false,
+          "commentsLocked": false
+        }
+      ],
+      "relatedProjects": [
+        {
+          "handle": "example",
+          "displayName": "Example Page",
+          "dek": "for use in documentation",
+          "description": "this account was created by @noracodes for use in documentation and testing of the Cohost API. i am happy to hand this account over to @staff or give others access to post here if they want to add cases to the post history or whatever.\r\n\r\nsee also @example-adult and @example-private",
+          "avatarURL": "https://cohost.org/rc/default-avatar/49507.png",
+          "avatarPreviewURL": "https://cohost.org/rc/default-avatar/49507.png",
+          "headerURL": null,
+          "headerPreviewURL": null,
+          "projectId": 49507,
+          "privacy": "public",
+          "pronouns": "",
+          "url": "https://www.rfc-editor.org/rfc/rfc2606.html",
+          "flags": [],
+          "avatarShape": "circle"
+        },
+        {
+          "handle": "example-adult",
+          "displayName": "",
+          "dek": "",
+          "description": "",
+          "avatarURL": "https://cohost.org/rc/default-avatar/49508.png",
+          "avatarPreviewURL": "https://cohost.org/rc/default-avatar/49508.png",
+          "headerURL": null,
+          "headerPreviewURL": null,
+          "projectId": 49508,
+          "privacy": "public",
+          "pronouns": null,
+          "url": null,
+          "flags": [],
+          "avatarShape": "circle"
+        }
+      ],
+      "singlePostPageUrl": "https://cohost.org/example/post/185916-commentary-repost-of",
+      "effectiveAdultContent": false,
+      "isEditor": false,
+      "contributorBlockIncomingOrOutgoing": false,
+      "hasAnyContributorMuted": false,
+      "postEditUrl": "https://cohost.org/example/post/185916-commentary-repost-of/edit",
+      "isLiked": false,
+      "canShare": false,
+      "canPublish": true,
+      "hasCohostPlus": true,
+      "pinned": false,
+      "commentsLocked": false
+    },
+    {
+      "postId": 185838,
+      "headline": "This is a test post.",
+      "publishedAt": "2022-11-04T03:17:49.605Z",
+      "filename": "185838-this-is-a-test-post",
+      "transparentShareOfPostId": null,
+      "state": 1,
+      "numComments": 0,
+      "numSharedComments": 0,
+      "cws": [],
+      "tags": [
+        "test tag one",
+        "test tag two",
+        "a very long tag with some symbols &^^$^(*(&^*& in it"
+      ],
+      "blocks": [
+        {
+          "type": "attachment",
+          "attachment": {
+            "fileURL": "https://staging.cohostcdn.org/attachment/2b1e7477-ba13-4f7e-9547-f0e2668b92b6/cooltext422710535227689.png",
+            "previewURL": "https://staging.cohostcdn.org/attachment/2b1e7477-ba13-4f7e-9547-f0e2668b92b6/cooltext422710535227689.png",
+            "attachmentId": "2b1e7477-ba13-4f7e-9547-f0e2668b92b6",
+            "altText": "Stylized text with stars reading: \"this block is an image attachment\""
+          }
+        },
+        {
+          "type": "markdown",
+          "markdown": {
+            "content": "Here's the body of the test post! This should form the first block."
+          }
+        },
+        {
+          "type": "markdown",
+          "markdown": {
+            "content": "This is a second paragraph of the test post, which should form the second block and includes _meaningful_*markdown* **formatting**."
+          }
+        },
+        {
+          "type": "markdown",
+          "markdown": {
+            "content": "This third paragraph, forming the third block, contains <span style=\"display: inline-block; background-color:green;\"> Raw HTML </span>."
+          }
+        }
+      ],
+      "plainTextBody": "Here's the body of the test post! This should form the first block.\n\nThis is a second paragraph of the test post, which should form the second block and includes _meaningful_*markdown* **formatting**.\n\nThis third paragraph, forming the third block, contains <span style=\"display: inline-block; background-color:green;\"> Raw HTML </span>.",
+      "postingProject": {
+        "handle": "example",
+        "displayName": "Example Page",
+        "dek": "for use in documentation",
+        "description": "this account was created by @noracodes for use in documentation and testing of the Cohost API. i am happy to hand this account over to @staff or give others access to post here if they want to add cases to the post history or whatever.\r\n\r\nsee also @example-adult and @example-private",
+        "avatarURL": "https://cohost.org/rc/default-avatar/49507.png",
+        "avatarPreviewURL": "https://cohost.org/rc/default-avatar/49507.png",
+        "headerURL": null,
+        "headerPreviewURL": null,
+        "projectId": 49507,
+        "privacy": "public",
+        "pronouns": "",
+        "url": "https://www.rfc-editor.org/rfc/rfc2606.html",
+        "flags": [],
+        "avatarShape": "circle"
+      },
+      "shareTree": [],
+      "relatedProjects": [],
+      "singlePostPageUrl": "https://cohost.org/example/post/185838-this-is-a-test-post",
+      "effectiveAdultContent": false,
+      "isEditor": false,
+      "contributorBlockIncomingOrOutgoing": false,
+      "hasAnyContributorMuted": false,
+      "postEditUrl": "https://cohost.org/example/post/185838-this-is-a-test-post/edit",
+      "isLiked": false,
+      "canShare": false,
+      "canPublish": true,
+      "hasCohostPlus": true,
+      "pinned": false,
+      "commentsLocked": false
+    }
+  ],
+  "_links": [
+    {
+      "href": "/api/v1/project/example",
+      "rel": "project",
+      "type": "GET"
+    }
+  ]
+}
