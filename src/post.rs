@@ -71,16 +71,18 @@ pub struct Post {
     /// Marks the post as a draft, preventing it from being seen by other users without the draft
     /// link.
     pub draft: bool,
-    /// Metadata returned by Cohost from posts retrieved from the API.
+    /// Metadata returned by cohost from posts retrieved from the API.
+    ///
+    /// This field is ignored when creating or editing a post.
     pub metadata: Option<PostMetadata>,
 }
 
-/// Metadata returned by the Cohost API for posts retrieved from post pages.
+/// Metadata returned by the cohost API for posts retrieved from post pages.
 #[derive(Debug)]
 #[non_exhaustive]
 #[allow(clippy::struct_excessive_bools, clippy::module_name_repetitions)]
 pub struct PostMetadata {
-    /// All identifiers regarding where this post can be found on Cohost.
+    /// All identifiers regarding where this post can be found.
     pub locations: PostLocations,
     /// True if the client has permission to share this post.
     pub can_share: bool,
@@ -118,7 +120,7 @@ pub struct PostLocations {
     /// The filename of the post, excluding the protocol, domain, and project.
     /// Acts as a unique ID with a semi-readable slug.
     pub filename: String,
-    /// The complete URL at which this post can be viewed on Cohost.
+    /// The complete URL at which this post can be viewed.
     pub url: String,
     /// The location at which this post can be edited.
     pub edit_url: String,
