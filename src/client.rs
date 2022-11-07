@@ -23,6 +23,7 @@ macro_rules! request_impl {
 pub struct Client {
     pub(crate) base_url: Cow<'static, str>,
     pub(crate) client: reqwest::Client,
+    logged_in: bool,
 }
 
 impl Client {
@@ -44,6 +45,7 @@ impl Client {
                 .user_agent(USER_AGENT)
                 .build()
                 .unwrap(),
+            logged_in: false,
         }
     }
 
@@ -61,7 +63,7 @@ impl Client {
     ///
     /// Securely storing the user's password is an exercise left to the caller.
     #[tracing::instrument(skip(self, password))]
-    pub async fn login(self, email: &str, password: &str) -> Result<Session, Error> {
+    pub async fn login(mut self, email: &str, password: &str) -> Result<Session, Error> {
         let SaltResponse { salt } = self
             .get("login/salt")
             .query(&[("email", email)])
@@ -89,13 +91,24 @@ impl Client {
             .json()
             .await?;
         tracing::info!(user_id, "logged in");
+        self.logged_in = true;
 
         Ok(Session { client: self })
     }
 
+    /// Returns true if this client has logged in before.
+    ///
+    /// This can be used to differentiate a reference as returned from [`Session::as_client`] or as
+    /// never logged in.
+    #[must_use]
+    pub fn has_logged_in(&self) -> bool {
+        self.logged_in
+    }
+
     /// Get a page of posts from the given project.
     ///
-    /// Pages start at 0. Once you get an empty page, there are no more pages after that to get; they will all be empty.
+    /// Pages start at 0. Once you get an empty page, there are no more pages after that to get;
+    /// they will all be empty.
     #[tracing::instrument(skip(self))]
     pub async fn get_posts_page(&self, project: &str, page: u64) -> Result<Vec<Post>, Error> {
         let posts_page: crate::post::PostPage = self

@@ -8,6 +8,14 @@ pub struct Session {
 }
 
 impl Session {
+    /// Returns the inner [`Client`] for this session.
+    ///
+    /// This can be used to access methods present on `Client`.
+    #[must_use]
+    pub fn as_client(&self) -> &Client {
+        &self.client
+    }
+
     /// Logs into cohost with an email and password, returning a `Session`.
     ///
     /// Securely storing the user's password is an exercise left to the caller.
