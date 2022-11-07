@@ -44,5 +44,5 @@ mod session;
 pub use crate::attachment::{Attachment, AttachmentId};
 pub use crate::client::Client;
 pub use crate::error::Error;
-pub use crate::post::{Post, PostId};
+pub use crate::post::{Post, PostId, PostLocations, PostMetadata};
 pub use crate::session::Session;
