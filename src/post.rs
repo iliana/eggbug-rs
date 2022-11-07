@@ -27,27 +27,6 @@ use std::fmt::Debug;
 #[serde(transparent)]
 pub struct PostId(pub u64);
 
-/// A project ID.
-#[derive(
-    Clone,
-    Copy,
-    Debug,
-    Default,
-    Deserialize,
-    Display,
-    Eq,
-    From,
-    FromStr,
-    Hash,
-    Into,
-    Ord,
-    PartialEq,
-    PartialOrd,
-    Serialize,
-)]
-#[serde(transparent)]
-pub struct ProjectId(pub u64);
-
 /// Describes a post's contents.
 ///
 /// When you send a post with [`Session::create_post`] or [`Session::edit_post`], the `Post` must
@@ -113,6 +92,7 @@ pub struct PostMetadata {
 
 /// All identifying information about where to find a post, from its ID to how to edit it.
 #[derive(Debug, Hash, Clone, PartialEq, Eq)]
+#[non_exhaustive]
 #[allow(clippy::module_name_repetitions)]
 pub struct PostLocations {
     /// The unique numerical ID of the post.
@@ -338,7 +318,7 @@ mod ser {
 }
 
 mod de {
-    use super::{PostId, ProjectId};
+    use super::PostId;
     use crate::AttachmentId;
     use serde::Deserialize;
 
@@ -355,17 +335,17 @@ mod de {
     #[allow(clippy::struct_excessive_bools)]
     pub struct Post {
         pub blocks: Vec<Block>,
-        pub can_publish: bool,
+        //pub can_publish: bool,
         pub can_share: bool,
         pub comments_locked: bool,
-        pub contributor_block_incoming_or_outgoing: bool,
+        //pub contributor_block_incoming_or_outgoing: bool,
         pub cws: Vec<String>,
         pub effective_adult_content: bool,
         pub filename: String,
         pub has_any_contributor_muted: bool,
         pub has_cohost_plus: bool,
         pub headline: String,
-        pub is_editor: bool,
+        //pub is_editor: bool,
         pub is_liked: bool,
         pub num_comments: u64,
         pub num_shared_comments: u64,
@@ -380,25 +360,25 @@ mod de {
         pub single_post_page_url: String,
         pub state: u64,
         pub tags: Vec<String>,
-        pub transparent_share_of_post_id: Option<PostId>,
+        //pub transparent_share_of_post_id: Option<PostId>,
     }
 
     #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
     #[serde(rename_all = "camelCase")]
     pub struct PostingProject {
         pub handle: String,
-        pub display_name: Option<String>,
-        pub dek: Option<String>,
-        pub description: Option<String>,
-        #[serde(rename = "avatarURL")]
-        pub avatar_url: String,
-        #[serde(rename = "avatarPreviewURL")]
-        pub avatar_preview_url: String,
-        pub project_id: ProjectId,
-        pub privacy: String,
-        pub pronouns: Option<String>,
-        pub url: Option<String>,
-        pub avatar_shape: String,
+        //pub display_name: Option<String>,
+        //pub dek: Option<String>,
+        //pub description: Option<String>,
+        //#[serde(rename = "avatarURL")]
+        //pub avatar_url: String,
+        //#[serde(rename = "avatarPreviewURL")]
+        //pub avatar_preview_url: String,
+        //pub project_id: ProjectId,
+        //pub privacy: String,
+        //pub pronouns: Option<String>,
+        //pub url: Option<String>,
+        //pub avatar_shape: String,
     }
 
     #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
@@ -449,7 +429,7 @@ fn test_parse_project_post_page() -> Result<(), Box<dyn std::error::Error>> {
     assert_eq!(post.headline, "This is a test post.");
     assert_eq!(post.filename, "185838-this-is-a-test-post");
     assert_eq!(post.state, 1);
-    assert!(post.transparent_share_of_post_id.is_none());
+    //assert!(post.transparent_share_of_post_id.is_none());
     assert_eq!(post.num_comments, 0);
     assert_eq!(post.num_shared_comments, 0);
     assert_eq!(post.tags.len(), 3);
