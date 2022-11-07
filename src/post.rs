@@ -77,6 +77,7 @@ pub struct Post {
 
 /// Metadata returned by the Cohost API for posts retrieved from post pages.
 #[derive(Debug)]
+#[non_exhaustive]
 #[allow(clippy::struct_excessive_bools, clippy::module_name_repetitions)]
 pub struct PostMetadata {
     /// All identifiers regarding where this post can be found on Cohost.
