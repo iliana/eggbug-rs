@@ -50,6 +50,8 @@ pub(crate) enum Inner {
         filename: String,
         content_type: String,
         content_length: u64,
+        width: Option<u32>,
+        height: Option<u32>,
     },
     Uploaded(Finished),
     Failed,
@@ -68,7 +70,13 @@ impl Attachment {
     /// # Panics
     ///
     /// Panics if the length of `content` overflows a [`u64`].
-    pub fn new(content: impl Into<Bytes>, filename: String, content_type: String) -> Attachment {
+    pub fn new(
+        content: impl Into<Bytes>,
+        filename: String,
+        content_type: String,
+        width: Option<u32>,
+        height: Option<u32>,
+    ) -> Attachment {
         let content: Bytes = content.into();
         Attachment {
             kind: Inner::New {
@@ -76,6 +84,8 @@ impl Attachment {
                 stream: content.into(),
                 filename,
                 content_type,
+                width,
+                height,
             },
             alt_text: String::new(),
         }
@@ -90,8 +100,8 @@ impl Attachment {
         use tokio::fs::File;
         use tokio_util::codec::{BytesCodec, FramedRead};
 
+        let path = path.as_ref();
         let filename = path
-            .as_ref()
             .file_name()
             .and_then(std::ffi::OsStr::to_str)
             .unwrap_or("file")
@@ -101,12 +111,22 @@ impl Attachment {
         let content_length = file.metadata().await?.len();
         let stream = Body::wrap_stream(FramedRead::new(file, BytesCodec::new()));
 
+        let (width, height) = (None, None);
+
+        #[cfg(feature = "imagesize")]
+        let (width, height) = match imagesize::size(path) {
+            Ok(dim) => (Some(dim.width as u32), Some(dim.height as u32)),
+            Err(_) => (None, None),
+        };
+
         Ok(Attachment {
             kind: Inner::New {
                 stream,
                 filename,
                 content_type,
                 content_length,
+                width,
+                height,
             },
             alt_text: String::new(),
         })
@@ -158,14 +178,23 @@ impl Attachment {
         project: &str,
         id: PostId,
     ) -> Result<(), Error> {
-        let (stream, filename, content_type, content_length) =
+        let (stream, filename, content_type, content_length, width, height) =
             match std::mem::replace(&mut self.kind, Inner::Failed) {
                 Inner::New {
                     stream,
                     filename,
                     content_type,
                     content_length,
-                } => (stream, filename, content_type, content_length),
+                    width,
+                    height,
+                } => (
+                    stream,
+                    filename,
+                    content_type,
+                    content_length,
+                    width,
+                    height,
+                ),
                 Inner::Uploaded(_) => return Ok(()),
                 Inner::Failed => return Err(Error::FailedAttachment),
             };
@@ -175,7 +204,9 @@ impl Attachment {
             .json(&AttachStartRequest {
                 filename: &filename,
                 content_type: &content_type,
-                content_length: content_length.to_string(),
+                content_length,
+                width,
+                height,
             })
             .send()
             .await?
@@ -224,7 +255,13 @@ impl Attachment {
 struct AttachStartRequest<'a> {
     filename: &'a str,
     content_type: &'a str,
-    content_length: String,
+    content_length: u64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    width: Option<u32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    height: Option<u32>,
 }
 
 #[derive(Deserialize)]
