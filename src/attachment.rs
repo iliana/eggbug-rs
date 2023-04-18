@@ -94,24 +94,27 @@ impl Attachment {
     /// Create an `Attachment` from a file on disk.
     #[cfg(feature = "fs")]
     pub async fn new_from_file(
-        path: impl AsRef<std::path::Path> + Clone,
+        path: impl AsRef<std::path::Path>,
         content_type: String,
     ) -> Result<Attachment, std::io::Error> {
         use tokio::fs::File;
         use tokio_util::codec::{BytesCodec, FramedRead};
 
+        let path = path.as_ref();
         let filename = path
-            .as_ref()
             .file_name()
             .and_then(std::ffi::OsStr::to_str)
             .unwrap_or("file")
             .to_owned();
 
-        let file = File::open(path.clone()).await?;
+        let file = File::open(path).await?;
         let content_length = file.metadata().await?.len();
         let stream = Body::wrap_stream(FramedRead::new(file, BytesCodec::new()));
 
-        let (width, height) = match imagesize::size(path.clone()) {
+        let (width, height) = (None, None);
+
+        #[cfg(feature = "imagesize")]
+        let (width, height) = match imagesize::size(path) {
             Ok(dim) => (Some(dim.width as u32), Some(dim.height as u32)),
             Err(_) => (None, None),
         };
