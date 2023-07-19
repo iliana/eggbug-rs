@@ -1,4 +1,4 @@
-use crate::{Attachment, Error, Session};
+use crate::{Ask, Asker, Attachment, Error, Session};
 pub(crate) use de::PostPage;
 use derive_more::{Display, From, FromStr, Into};
 use reqwest::Method;
@@ -39,6 +39,8 @@ pub struct Post {
     pub adult_content: bool,
     /// Post headline, which is displayed above attachments and markdown.
     pub headline: String,
+    /// The ask to which this post is responding, if any.
+    pub ask: Option<Ask>,
     /// List of attachments, displayed between the headline and markdown.
     pub attachments: Vec<Attachment>,
     /// Markdown content for the post, displayed after the headline and attachments.
@@ -229,19 +231,22 @@ impl From<de::Post> for Post {
             share_tree: api.share_tree.into_iter().map(Post::from).collect(),
         };
 
-        let attachments: Vec<Attachment> = api
-            .blocks
-            .into_iter()
-            .filter_map(|block| match block {
+        let mut attachments: Vec<Attachment> = Vec::new();
+        let mut ask: Option<Ask> = None;
+        for block in api.blocks {
+            match block {
                 de::Block::Attachment { attachment } => {
-                    Some(crate::attachment::Attachment::from(attachment))
+                    attachments.push(crate::attachment::Attachment::from(attachment));
                 }
-                de::Block::Markdown { .. } => None,
-            })
-            .collect();
+                // Note: there should only be one ask per post!
+                de::Block::Ask { ask: v } => ask = Some(crate::ask::Ask::from(v)),
+                de::Block::Markdown { .. } => {}
+            }
+        }
 
         Self {
             metadata: Some(metadata),
+            ask,
             adult_content: api.effective_adult_content,
             headline: api.headline,
             markdown: api.plain_text_body,
@@ -261,6 +266,26 @@ impl From<de::Attachment> for Attachment {
                 url: api.file_url,
             }),
             alt_text: api.alt_text,
+        }
+    }
+}
+
+impl From<de::Ask> for Ask {
+    fn from(api: de::Ask) -> Self {
+        Self {
+            ask_id: api.ask_id,
+            asker: api.asking_project.map(|v| crate::ask::Asker::from(v)),
+            content: api.content,
+            sent_at: api.sent_at,
+        }
+    }
+}
+
+impl From<de::AskingProject> for Asker {
+    fn from(api: de::AskingProject) -> Self {
+        Self {
+            display_name: api.display_name.unwrap_or_else(|| api.handle.clone()),
+            handle: api.handle,
         }
     }
 }
@@ -319,7 +344,7 @@ mod ser {
 
 mod de {
     use super::PostId;
-    use crate::AttachmentId;
+    use crate::{AskId, AttachmentId};
     use serde::Deserialize;
 
     #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
@@ -382,10 +407,27 @@ mod de {
     }
 
     #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+    #[serde(rename_all = "camelCase")]
+    pub struct AskingProject {
+        pub handle: String,
+        pub display_name: Option<String>,
+        //pub dek: Option<String>,
+        //pub description: Option<String>,
+        //#[serde(rename = "avatarURL")]
+        //pub avatar_url: String,
+        //#[serde(rename = "avatarPreviewURL")]
+        //pub avatar_preview_url: String,
+        //pub project_id: ProjectId,
+        //pub privacy: String,
+        //pub avatar_shape: String,
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
     #[serde(tag = "type", rename_all = "camelCase")]
     pub enum Block {
         Attachment { attachment: Attachment },
         Markdown { markdown: Markdown },
+        Ask { ask: Ask },
     }
 
     #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
@@ -403,6 +445,19 @@ mod de {
     #[serde(rename_all = "camelCase")]
     pub struct Markdown {
         pub content: String,
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+    #[serde(rename_all = "camelCase")]
+    pub struct Ask {
+        #[serde(rename = "askId")]
+        pub ask_id: AskId,
+        pub anon: bool,
+        #[serde(rename = "askingProject")]
+        pub asking_project: Option<AskingProject>,
+        pub content: String,
+        #[serde(rename = "sentAt")]
+        pub sent_at: chrono::DateTime<chrono::Utc>,
     }
 
     #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
@@ -448,6 +503,29 @@ fn test_parse_project_post_page() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[test]
+fn test_parse_project_post_page_with_ask() -> Result<(), Box<dyn std::error::Error>> {
+    let post_page: de::PostPage =
+        serde_json::from_str(include_str!("../samples/with-ask.project.posts.json"))?;
+
+    let post = post_page
+        .items
+        .iter()
+        .find(|post| post.post_id.0 == 1_811_182)
+        .expect("Couldn't find post by ID 1811182 as expected; did you change the sample?");
+
+    assert_eq!(post.blocks.len(), 3);
+    let ask = match post.blocks.iter().next() {
+        Some(de::Block::Ask { ask }) => ask,
+        _ => panic!("no ask block in ask test post"),
+    };
+    assert_eq!(ask.ask_id, crate::ask::AskId("871936863978390842".into()));
+    assert!(!ask.anon);
+    assert!(ask.asking_project.is_some());
+    assert_eq!(ask.content.len(), 84);
+    Ok(())
+}
+
+#[test]
 fn test_convert_post() -> Result<(), Box<dyn std::error::Error>> {
     let post_page: de::PostPage =
         serde_json::from_str(include_str!("../samples/example.project.posts.json"))?;
@@ -467,5 +545,25 @@ fn test_convert_post() -> Result<(), Box<dyn std::error::Error>> {
         1_667_531_869
     );
 
+    Ok(())
+}
+
+#[test]
+fn test_convert_project_post_with_ask() -> Result<(), Box<dyn std::error::Error>> {
+    let post_page: de::PostPage =
+        serde_json::from_str(include_str!("../samples/with-ask.project.posts.json"))?;
+
+    let post = post_page
+        .items
+        .iter()
+        .find(|post| post.post_id.0 == 1_811_182)
+        .expect("Couldn't find post by ID 1811182 as expected; did you change the sample?");
+
+    let converted_post = Post::from(post.clone());
+    let ask = converted_post.ask.expect("no ask in ask example post!");
+    assert_eq!(ask.id(), "871936863978390842");
+    assert_eq!(ask.content.len(), 84);
+    let asker = ask.asker.expect("no asker in ask example post!");
+    assert_eq!(asker.handle, "asunchaser".to_string());
     Ok(())
 }

@@ -35,12 +35,14 @@
 #![warn(clippy::pedantic, missing_docs)]
 #![allow(clippy::missing_errors_doc)]
 
+mod ask;
 mod attachment;
 mod client;
 mod error;
 mod post;
 mod session;
 
+pub use crate::ask::{Ask, AskId, Asker};
 pub use crate::attachment::{Attachment, AttachmentId};
 pub use crate::client::Client;
 pub use crate::error::Error;
