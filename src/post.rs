@@ -170,7 +170,7 @@ impl Post {
             .iter()
             .map(|attachment| ser::Block::Attachment {
                 attachment: ser::Attachment {
-                    alt_text: &attachment.alt_text,
+                    alt_text: attachment.alt_text.as_deref(),
                     attachment_id: attachment.id().unwrap_or_default(),
                 },
             })
@@ -331,7 +331,8 @@ mod ser {
     #[derive(Serialize)]
     #[serde(rename_all = "camelCase")]
     pub struct Attachment<'a> {
-        pub alt_text: &'a str,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub alt_text: Option<&'a str>,
         pub attachment_id: AttachmentId,
     }
 
@@ -433,7 +434,8 @@ mod de {
     #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
     #[serde(rename_all = "camelCase")]
     pub struct Attachment {
-        pub alt_text: String,
+        #[serde(default)]
+        pub alt_text: Option<String>,
         pub attachment_id: AttachmentId,
         #[serde(rename = "fileURL")]
         pub file_url: String,

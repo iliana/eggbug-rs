@@ -43,7 +43,7 @@ mod post;
 mod session;
 
 pub use crate::ask::{Ask, AskId, Asker};
-pub use crate::attachment::{Attachment, AttachmentId};
+pub use crate::attachment::{Attachment, AttachmentId, MediaMetadata};
 pub use crate::client::Client;
 pub use crate::error::Error;
 pub use crate::post::{Post, PostId, PostLocations, PostMetadata};
