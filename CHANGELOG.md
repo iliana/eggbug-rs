@@ -2,9 +2,9 @@
 
 - eggbug-rs is now "lightly maintained": pull requests will generally be merged without testing, and new releases will generally be "breaking" (e.g. 0.2.x -> 0.3.x) unless I am positively certain a change does not break semver
 - Add ability to fetch posts by project and page (@NoraCodes, [#2](https://github.com/iliana/eggbug-rs/pull/2))
-- Update attachment start API by (@jkap, [#3](https://github.com/iliana/eggbug-rs/pull/3))
-- Add read-only support for asks by (@NoraCodes, [#4](https://github.com/iliana/eggbug-rs/pull/4))
-- Audio attachments by (@xenofem, [#6](https://github.com/iliana/eggbug-rs/pull/6))
+- Update attachment start API (@jkap, [#3](https://github.com/iliana/eggbug-rs/pull/3))
+- Add read-only support for asks (@NoraCodes, [#4](https://github.com/iliana/eggbug-rs/pull/4))
+- Audio attachments (@xenofem, [#6](https://github.com/iliana/eggbug-rs/pull/6))
 
 ## 0.1.3 -- 2022-11-02
 
