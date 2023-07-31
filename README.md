@@ -29,3 +29,8 @@ session.edit_post("eggbug", id, &mut post).await?;
 ## License
 
 eggbug-rs is released under the terms of the Anti-Capitalist Software License, version 1.4.
+
+## Maintenance
+
+eggbug-rs is "lightly maintained": pull requests are generally merged quickly and without
+testing or API review, and new releases will generally be "breaking" (e.g. 0.2.x -> 0.3.x).

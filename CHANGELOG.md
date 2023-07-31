@@ -1,3 +1,9 @@
+## 0.2.0 -- 2023-07-31
+
+- eggbug-rs is now "lightly maintained": pull requests will generally be merged without testing, and new releases will generally be "breaking" (e.g. 0.2.x -> 0.3.x) unless I am positively certain a change does not break semver
+- Support deserializing Asks ([#4](https://github.com/iliana/eggbug-rs/pull/4), @NoraCodes)
+- Support posting with audio attachments ([#6](https://github.com/iliana/eggbug-rs/pull/6), @xenofem)
+
 ## 0.1.3 -- 2022-11-02
 
 - Fixed decoding the password hashing salt to match the official client ([#1](https://github.com/iliana/eggbug-rs/issues/1)). This problem affects roughly half of accounts on cohost, assuming password salts are randomly distributed.
