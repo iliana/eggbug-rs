@@ -3,7 +3,7 @@ use bytes::Bytes;
 use derive_more::{Display, From, FromStr, Into};
 use reqwest::multipart::{Form, Part};
 use reqwest::Body;
-use serde::{Deserialize, Serialize};
+use serde::{ser::SerializeMap, Deserialize, Serialize, Serializer};
 use std::collections::HashMap;
 use uuid::Uuid;
 
@@ -40,7 +40,30 @@ pub struct Attachment {
     pub(crate) kind: Inner,
 
     /// Alt text associated with this attachment.
-    pub alt_text: String,
+    pub alt_text: Option<String>,
+}
+
+/// Attachment metadata specific to a supported type of media.
+#[derive(Debug, Serialize)]
+#[serde(untagged)]
+pub enum MediaMetadata {
+    /// Image attachments
+    Image {
+        /// Image width
+        #[serde(skip_serializing_if = "Option::is_none")]
+        width: Option<u32>,
+        /// Image height
+        #[serde(skip_serializing_if = "Option::is_none")]
+        height: Option<u32>,
+    },
+    /// Audio attachments
+    #[serde(serialize_with = "serialize_audio_metadata")]
+    Audio {
+        /// Audio artist
+        artist: String,
+        /// Audio title
+        title: String,
+    },
 }
 
 #[derive(Debug)]
@@ -50,8 +73,7 @@ pub(crate) enum Inner {
         filename: String,
         content_type: String,
         content_length: u64,
-        width: Option<u32>,
-        height: Option<u32>,
+        metadata: Option<MediaMetadata>,
     },
     Uploaded(Finished),
     Failed,
@@ -74,20 +96,25 @@ impl Attachment {
         content: impl Into<Bytes>,
         filename: String,
         content_type: String,
-        width: Option<u32>,
-        height: Option<u32>,
+        metadata: MediaMetadata,
     ) -> Attachment {
         let content: Bytes = content.into();
+
+        let alt_text = if let MediaMetadata::Image { .. } = metadata {
+            Some(String::new())
+        } else {
+            None
+        };
+
         Attachment {
             kind: Inner::New {
                 content_length: content.len().try_into().unwrap(),
                 stream: content.into(),
                 filename,
                 content_type,
-                width,
-                height,
+                metadata: Some(metadata),
             },
-            alt_text: String::new(),
+            alt_text,
         }
     }
 
@@ -96,6 +123,7 @@ impl Attachment {
     pub async fn new_from_file(
         path: impl AsRef<std::path::Path>,
         content_type: String,
+        metadata: Option<MediaMetadata>,
     ) -> Result<Attachment, std::io::Error> {
         use tokio::fs::File;
         use tokio_util::codec::{BytesCodec, FramedRead};
@@ -111,12 +139,31 @@ impl Attachment {
         let content_length = file.metadata().await?.len();
         let stream = Body::wrap_stream(FramedRead::new(file, BytesCodec::new()));
 
-        let (width, height) = (None, None);
+        let metadata = if metadata.is_some() {
+            metadata
+        } else if content_type.starts_with("image/") {
+            let (width, height) = (None, None);
 
-        #[cfg(feature = "imagesize")]
-        let (width, height) = match imagesize::size(path) {
-            Ok(dim) => (Some(dim.width as u32), Some(dim.height as u32)),
-            Err(_) => (None, None),
+            #[cfg(feature = "imagesize")]
+            let (width, height) = match imagesize::size(path) {
+                Ok(dim) => (Some(dim.width as u32), Some(dim.height as u32)),
+                Err(_) => (None, None),
+            };
+
+            Some(MediaMetadata::Image { width, height })
+        } else if content_type.starts_with("audio/") {
+            Some(MediaMetadata::Audio {
+                artist: String::new(),
+                title: String::new(),
+            })
+        } else {
+            None
+        };
+
+        let alt_text = if let Some(MediaMetadata::Image { .. }) = metadata {
+            Some(String::new())
+        } else {
+            None
         };
 
         Ok(Attachment {
@@ -125,10 +172,9 @@ impl Attachment {
                 filename,
                 content_type,
                 content_length,
-                width,
-                height,
+                metadata,
             },
-            alt_text: String::new(),
+            alt_text,
         })
     }
 
@@ -137,7 +183,7 @@ impl Attachment {
     pub fn with_alt_text(self, alt_text: String) -> Attachment {
         Attachment {
             kind: self.kind,
-            alt_text,
+            alt_text: Some(alt_text),
         }
     }
 
@@ -178,35 +224,30 @@ impl Attachment {
         project: &str,
         id: PostId,
     ) -> Result<(), Error> {
-        let (stream, filename, content_type, content_length, width, height) =
+        let (stream, filename, content_type, content_length, metadata) =
             match std::mem::replace(&mut self.kind, Inner::Failed) {
                 Inner::New {
                     stream,
                     filename,
                     content_type,
                     content_length,
-                    width,
-                    height,
-                } => (
-                    stream,
-                    filename,
-                    content_type,
-                    content_length,
-                    width,
-                    height,
-                ),
+                    metadata,
+                } => (stream, filename, content_type, content_length, metadata),
                 Inner::Uploaded(_) => return Ok(()),
                 Inner::Failed => return Err(Error::FailedAttachment),
             };
 
-        let response: AttachStartResponse = client
-            .post(&format!("project/{}/posts/{}/attach/start", project, id))
+        let TrpcResponse {
+            result: TrpcData { data: response },
+        }: TrpcResponse<AttachStartResponse> = client
+            .post("trpc/posts.attachment.start")
             .json(&AttachStartRequest {
+                project_handle: project,
+                post_id: id,
                 filename: &filename,
                 content_type: &content_type,
                 content_length,
-                width,
-                height,
+                metadata,
             })
             .send()
             .await?
@@ -251,17 +292,33 @@ impl Attachment {
 }
 
 #[derive(Serialize)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all = "camelCase")]
 struct AttachStartRequest<'a> {
+    project_handle: &'a str,
+    post_id: PostId,
+
     filename: &'a str,
     content_type: &'a str,
     content_length: u64,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    width: Option<u32>,
+    #[serde(flatten, skip_serializing_if = "Option::is_none")]
+    metadata: Option<MediaMetadata>,
+}
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    height: Option<u32>,
+#[derive(Serialize)]
+struct AudioMetadata<'a> {
+    artist: &'a str,
+    title: &'a str,
+}
+
+fn serialize_audio_metadata<S: Serializer>(
+    artist: &str,
+    title: &str,
+    serializer: S,
+) -> Result<S::Ok, S::Error> {
+    let mut map = serializer.serialize_map(Some(1))?;
+    map.serialize_entry("metadata", &AudioMetadata { artist, title })?;
+    map.end()
 }
 
 #[derive(Deserialize)]
@@ -270,4 +327,14 @@ struct AttachStartResponse {
     attachment_id: AttachmentId,
     url: String,
     required_fields: HashMap<String, String>,
+}
+
+#[derive(Deserialize)]
+struct TrpcResponse<D> {
+    result: TrpcData<D>,
+}
+
+#[derive(Deserialize)]
+struct TrpcData<D> {
+    data: D,
 }
