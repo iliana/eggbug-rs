@@ -33,7 +33,12 @@
 
 #![deny(elided_lifetimes_in_paths)]
 #![warn(clippy::pedantic, missing_docs)]
-#![allow(clippy::missing_errors_doc)]
+#![allow(
+    clippy::manual_let_else,
+    clippy::missing_errors_doc,
+    clippy::module_name_repetitions,
+    clippy::uninlined_format_args
+)]
 
 mod ask;
 mod attachment;

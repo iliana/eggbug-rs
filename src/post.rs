@@ -183,12 +183,15 @@ impl Post {
             }
         }
 
+        #[allow(clippy::bool_to_int_with_if)]
+        let post_state = if force_draft || self.draft { 0 } else { 1 };
+
         let post = ser::Post {
             adult_content: self.adult_content,
             blocks,
             cws: &self.content_warnings,
             headline: &self.headline,
-            post_state: if force_draft || self.draft { 0 } else { 1 },
+            post_state,
             share_of_post_id: shared_post,
             tags: &self.tags,
         };
@@ -274,7 +277,7 @@ impl From<de::Ask> for Ask {
     fn from(api: de::Ask) -> Self {
         Self {
             ask_id: api.ask_id,
-            asker: api.asking_project.map(|v| crate::ask::Asker::from(v)),
+            asker: api.asking_project.map(crate::ask::Asker::from),
             content: api.content,
             sent_at: api.sent_at,
         }
@@ -516,7 +519,7 @@ fn test_parse_project_post_page_with_ask() -> Result<(), Box<dyn std::error::Err
         .expect("Couldn't find post by ID 1811182 as expected; did you change the sample?");
 
     assert_eq!(post.blocks.len(), 3);
-    let ask = match post.blocks.iter().next() {
+    let ask = match post.blocks.first() {
         Some(de::Block::Ask { ask }) => ask,
         _ => panic!("no ask block in ask test post"),
     };

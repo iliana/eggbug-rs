@@ -36,6 +36,7 @@ pub struct Ask {
 
 impl Ask {
     /// Get the ID of the ask represented by this struct.
+    #[must_use]
     pub fn id(&self) -> &str {
         &self.ask_id.0
     }

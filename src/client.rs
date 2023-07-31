@@ -155,7 +155,7 @@ impl Default for Client {
 /// <https://github.com/mogery/cohost.js/commit/c0063a38ae334b4424989242821d0ac1aba78f03>
 fn decode_salt(salt: &str) -> Result<Vec<u8>, Error> {
     Ok(base64::decode_config(
-        &salt.replace(['-', '_'], "A"),
+        salt.replace(['-', '_'], "A"),
         base64::STANDARD_NO_PAD,
     )?)
 }

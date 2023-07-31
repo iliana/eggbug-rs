@@ -25,6 +25,7 @@ async fn main() -> Result<()> {
                 .join("examples")
                 .join("uh-oh.png"),
             "image/png".into(),
+            None,
         )
         .await?
         .with_alt_text("eggbug with question mark".into())],

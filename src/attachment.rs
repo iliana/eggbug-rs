@@ -142,11 +142,15 @@ impl Attachment {
         let metadata = if metadata.is_some() {
             metadata
         } else if content_type.starts_with("image/") {
+            #[cfg(not(feature = "imagesize"))]
             let (width, height) = (None, None);
 
             #[cfg(feature = "imagesize")]
             let (width, height) = match imagesize::size(path) {
-                Ok(dim) => (Some(dim.width as u32), Some(dim.height as u32)),
+                Ok(dim) => (
+                    Some(u32::try_from(dim.width).expect("width overflow")),
+                    Some(u32::try_from(dim.height).expect("height overflow")),
+                ),
                 Err(_) => (None, None),
             };
 
