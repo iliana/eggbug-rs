@@ -237,9 +237,13 @@ impl Attachment {
                 Inner::Failed => return Err(Error::FailedAttachment),
             };
 
-        let response: AttachStartResponse = client
-            .post(&format!("project/{}/posts/{}/attach/start", project, id))
+        let TrpcResponse {
+            result: TrpcData { data: response },
+        }: TrpcResponse<AttachStartResponse> = client
+            .post("trpc/posts.attachment.start")
             .json(&AttachStartRequest {
+                project_handle: project,
+                post_id: id,
                 filename: &filename,
                 content_type: &content_type,
                 content_length,
@@ -288,8 +292,11 @@ impl Attachment {
 }
 
 #[derive(Serialize)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all = "camelCase")]
 struct AttachStartRequest<'a> {
+    project_handle: &'a str,
+    post_id: PostId,
+
     filename: &'a str,
     content_type: &'a str,
     content_length: u64,
@@ -320,4 +327,14 @@ struct AttachStartResponse {
     attachment_id: AttachmentId,
     url: String,
     required_fields: HashMap<String, String>,
+}
+
+#[derive(Deserialize)]
+struct TrpcResponse<D> {
+    result: TrpcData<D>,
+}
+
+#[derive(Deserialize)]
+struct TrpcData<D> {
+    data: D,
 }
